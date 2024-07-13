@@ -3,6 +3,7 @@ import { sendResponse } from '../../utils/sendResponse';
 import { ProductServices } from './product.service';
 import { catchAsync } from '../../utils/catchAsync';
 import { Request, Response } from 'express';
+import AppError from '../../errors/AppError';
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
   const { product } = req.body;
@@ -22,9 +23,28 @@ const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
+    message: 'Products retrieved successfully',
+    data: result,
+  });
+});
+
+const getSingleProduct = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await ProductServices.getByIdFromDB(id);
+
+  if (result == null)
+    throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
     message: 'Product retrieved successfully',
     data: result,
   });
 });
 
-export const ProductControllers = { createProduct, getAllProducts };
+export const ProductControllers = {
+  createProduct,
+  getAllProducts,
+  getSingleProduct,
+};
