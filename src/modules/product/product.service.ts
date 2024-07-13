@@ -17,9 +17,14 @@ const updateIntoDB = async (id: string, payload: IProduct) => {
   return await Product.updateOne({ _id: id }, payload, { new: true });
 };
 
+const deleteFromDB = async (id: string) => {
+  return await Product.deleteOne({ _id: id });
+};
+
 export const ProductServices = {
   saveIntoDB,
   getAllFromDB,
   getByIdFromDB,
   updateIntoDB,
+  deleteFromDB,
 };
