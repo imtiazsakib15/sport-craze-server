@@ -13,8 +13,13 @@ const getByIdFromDB = async (id: string) => {
   return await Product.findOne({ _id: id });
 };
 
+const updateIntoDB = async (id: string, payload: IProduct) => {
+  return await Product.updateOne({ _id: id }, payload, { new: true });
+};
+
 export const ProductServices = {
   saveIntoDB,
   getAllFromDB,
   getByIdFromDB,
+  updateIntoDB,
 };
