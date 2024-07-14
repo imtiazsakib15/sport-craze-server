@@ -6,17 +6,23 @@ const saveIntoDB = async (payload: IProduct) => {
 };
 
 const getAllFromDB = async (query: Record<string, unknown>) => {
+  const queryCopy: Record<string, unknown> = { ...query };
   let searchTerm: string = '';
   if (query?.searchTerm) searchTerm = query.searchTerm as string;
 
-  const searchableFields = ['name'];
+  const searchableFields: string[] = ['name'];
   const searchQuery = Product.find({
     $or: searchableFields.map((field) => ({
       [field]: new RegExp(searchTerm, 'i'),
     })),
   });
 
-  return await searchQuery.find({});
+  const excludeFields: string[] = ['searchTerm'];
+  excludeFields.map((field) => delete queryCopy[field]);
+
+  const filterQuery = searchQuery.find(queryCopy);
+
+  return await filterQuery.find({});
 };
 
 const getByIdFromDB = async (id: string) => {
