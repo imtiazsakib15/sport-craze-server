@@ -17,7 +17,7 @@ const getAllFromDB = async (query: Record<string, unknown>) => {
     })),
   });
 
-  const excludeFields: string[] = ['searchTerm', 'sort'];
+  const excludeFields: string[] = ['searchTerm', 'sort', 'page', 'limit'];
   excludeFields.map((field) => delete queryCopy[field]);
 
   const filterQuery = searchQuery.find(queryCopy);
@@ -26,7 +26,15 @@ const getAllFromDB = async (query: Record<string, unknown>) => {
 
   const sortQuery = filterQuery.sort(sort);
 
-  return await sortQuery;
+  let page: number = 1;
+  let limit: number = 12;
+  if (query?.page) page = Number(query.page);
+  if (query.limit) limit = Number(query.limit);
+  const skip: number = (page - 1) * limit;
+
+  const paginateQuery = sortQuery.skip(skip).limit(limit);
+
+  return await paginateQuery;
 };
 
 const getByIdFromDB = async (id: string) => {
