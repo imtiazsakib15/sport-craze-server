@@ -17,12 +17,16 @@ const getAllFromDB = async (query: Record<string, unknown>) => {
     })),
   });
 
-  const excludeFields: string[] = ['searchTerm'];
+  const excludeFields: string[] = ['searchTerm', 'sort'];
   excludeFields.map((field) => delete queryCopy[field]);
 
   const filterQuery = searchQuery.find(queryCopy);
 
-  return await filterQuery.find({});
+  const sort: string = (query?.sort as string) || '-createdAt';
+
+  const sortQuery = filterQuery.sort(sort);
+
+  return await sortQuery;
 };
 
 const getByIdFromDB = async (id: string) => {
