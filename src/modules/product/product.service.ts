@@ -5,8 +5,18 @@ const saveIntoDB = async (payload: IProduct) => {
   return await Product.create(payload);
 };
 
-const getAllFromDB = async () => {
-  return await Product.find({});
+const getAllFromDB = async (query: Record<string, unknown>) => {
+  let searchTerm: string = '';
+  if (query?.searchTerm) searchTerm = query.searchTerm as string;
+
+  const searchableFields = ['name'];
+  const searchQuery = Product.find({
+    $or: searchableFields.map((field) => ({
+      [field]: new RegExp(searchTerm, 'i'),
+    })),
+  });
+
+  return await searchQuery.find({});
 };
 
 const getByIdFromDB = async (id: string) => {
