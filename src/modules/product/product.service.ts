@@ -17,12 +17,19 @@ const getAllFromDB = async (query: Record<string, unknown>) => {
     })),
   });
 
-  const excludeFields: string[] = ['searchTerm', 'sort', 'page', 'limit'];
+  const excludeFields: string[] = [
+    'searchTerm',
+    'sort',
+    'page',
+    'limit',
+    'fields',
+  ];
   excludeFields.map((field) => delete queryCopy[field]);
 
   const filterQuery = searchQuery.find(queryCopy);
 
-  const sort: string = (query?.sort as string) || '-createdAt';
+  const sort: string =
+    (query?.sort as string)?.split(',').join(' ') || '-createdAt';
 
   const sortQuery = filterQuery.sort(sort);
 
@@ -34,7 +41,12 @@ const getAllFromDB = async (query: Record<string, unknown>) => {
 
   const paginateQuery = sortQuery.skip(skip).limit(limit);
 
-  return await paginateQuery;
+  let fields: string = '';
+  if (query?.fields) fields = (query.fields as string)?.split(',').join(' ');
+
+  const fieldLimitingQuery = paginateQuery.select(fields);
+
+  return await fieldLimitingQuery;
 };
 
 const getByIdFromDB = async (id: string) => {
