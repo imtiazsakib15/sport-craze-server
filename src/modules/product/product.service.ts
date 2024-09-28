@@ -7,7 +7,7 @@ const saveIntoDB = async (payload: IProduct) => {
 };
 
 const getAllFromDB = async (query: Record<string, unknown>) => {
-  const searchableFields: string[] = ['name'];
+  const searchableFields: string[] = ['name', 'category', 'brand'];
   const productQuery = new QueryBuilder(Product.find(), query)
     .search(searchableFields)
     .filter()

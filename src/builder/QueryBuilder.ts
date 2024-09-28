@@ -29,8 +29,19 @@ class QueryBuilder<T> {
       'limit',
       'fields',
     ];
-    excludeFields.map((field: string) => delete queryCopy[field]);
-    this.modelQuery = this.modelQuery.find(queryCopy);
+    excludeFields.forEach((field: string) => delete queryCopy[field]);
+
+    const searchableFields: string[] = Object.keys(queryCopy);
+
+    if (searchableFields.length > 0) {
+      this.modelQuery = this.modelQuery.find({
+        $and: searchableFields.map((field: string) => ({
+          [field]: /[A-Za-z]/.test(queryCopy[field] as string)
+            ? { $regex: new RegExp(queryCopy[field] as string, 'i') }
+            : queryCopy[field],
+        })),
+      } as FilterQuery<T>);
+    }
     return this;
   }
 
